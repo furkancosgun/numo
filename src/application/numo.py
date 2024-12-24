@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 from src.domain.interfaces.numo_manager import NumoManager
 from src.domain.interfaces.numo_runner import NumoRunner
 from src.infrastructure.managers import VariableManager, FunctionManager
@@ -76,3 +76,35 @@ class Numo:
             result.append(processed_line)
             
         return result 
+
+    def add_function(self, name: str, func: Callable[[List[str]], Any]) -> None:
+        """
+        Add a new custom function to the Numo engine.
+        
+        Args:
+            name: Function name to register
+            func: Function implementation that takes a list of string parameters and returns any value
+            
+        Example:
+            >>> numo = Numo()
+            >>> numo.add_function("sum", lambda params: sum(float(p) for p in params))
+            >>> await numo.calculate(["sum(1, 2, 3)"])  # ["6.0"]
+        """
+        function_manager = next(m for m in self._managers if isinstance(m, FunctionManager))
+        function_manager.add_function(name, func) 
+
+    def add_variable(self, name: str, value: Any) -> None:
+        """
+        Add a new variable to the Numo engine.
+        
+        Args:
+            name: Variable name to register
+            value: Value to associate with the variable
+            
+        Example:
+            >>> numo = Numo()
+            >>> numo.add_variable("pi", 3.14159)
+            >>> await numo.calculate(["2 * pi"])  # ["6.28318"]
+        """
+        variable_manager = next(m for m in self._managers if isinstance(m, VariableManager))
+        variable_manager.add_variable(name, value) 

@@ -1,4 +1,3 @@
-
 # Numo 🔢
 
 Numo is a versatile Python package that combines mathematical operations, unit conversions, currency conversions, and translations in one powerful tool.
@@ -7,8 +6,10 @@ Numo is a versatile Python package that combines mathematical operations, unit c
 
 - **Mathematical Operations** 🧮
   - Basic arithmetic (`+`, `-`, `*`, `/`, `^`, `%`)
-  - Function support (`nsum`, `navg`, `nmax`, `nmin`)
+  - Built-in functions (`nsum`, `navg`, `nmax`, `nmin`)
   - Variable management (`x = 5`, `y = x + 3`)
+  - Custom function support (`numo.add_function("double", lambda params: float(params[0]) * 2)`)
+  - Custom variable support (`numo.add_variable("pi", 3.14159)`)
 
 - **Unit Conversions** 📏
   - Length (km, m, cm, mm, mile, etc.)
@@ -59,14 +60,26 @@ import asyncio
 
 async def main():
     numo = Numo()
+    
+    # Add custom functions
+    numo.add_function("double", lambda params: float(params[0]) * 2)
+    numo.add_function("sum_squares", lambda params: sum(float(p)**2 for p in params))
+    
+    # Add custom variables
+    numo.add_variable("pi", 3.14159)
+    numo.add_variable("gravity", 9.81)
+    
     results = await numo.calculate([
         "2 + 2",                  # Math: 4
         "1 km to m",              # Units: 1000 m
         "hello in spanish",       # Translation: hola
-        "100 usd to eur",        # Currency: ~85 EUR
-        "x = 5",                 # Variables
-        "x + 3",                 # Using variables: 8
-        "nsum(1, 2, 3, 4, 5)"   # Functions: 15
+        "100 usd to eur",         # Currency: ~85 EUR
+        "x = 5",                  # Variables
+        "x + 3",                  # Using variables: 8
+        "nsum(1, 2, 3, 4, 5)",   # Built-in functions: 15
+        "double(5)",              # Custom function: 10
+        "2 * pi",                 # Custom variable: 6.28318
+        "gravity * 2"             # Custom variable: 19.62
     ])
     
     for expr, result in zip(expressions, results):
@@ -101,9 +114,17 @@ if __name__ == "__main__":
 "x = 5"              # Define variable
 "y = x + 3"          # Use variable: 8
 
-# Functions
+# Built-in Functions
 "nsum(1,2,3,4)"      # -> 10
 "navg(2,4,6,8)"      # -> 5
+
+# Custom Functions
+numo.add_function("double", lambda params: float(params[0]) * 2)
+"double(5)"          # -> 10
+
+# Custom Variables
+numo.add_variable("pi", 3.14159)
+"2 * pi"             # -> 6.28318
 ```
 
 ## Development 🛠️
@@ -147,4 +168,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Furkan Coşgun**
 - Email: furkan51cosgun@gmail.com
 - GitHub: [@furkancosgun](https://github.com/furkancosgun)
-

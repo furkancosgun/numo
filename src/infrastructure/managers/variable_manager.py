@@ -1,5 +1,5 @@
 import re
-from typing import Dict
+from typing import Dict, Any
 from src.domain.interfaces.numo_manager import NumoManager
 
 class VariableManager(NumoManager):
@@ -72,3 +72,13 @@ class VariableManager(NumoManager):
             self._variables[variable_name.lower()] = variable_value
             return True
         return False 
+
+    def add_variable(self, name: str, value: Any) -> None:
+        """
+        Add a new variable to the manager.
+        
+        Args:
+            name: Variable name to register
+            value: Value to associate with the variable
+        """
+        self._variables[name.lower()] = str(value) 
