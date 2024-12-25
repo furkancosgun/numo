@@ -2,6 +2,7 @@ import re
 from typing import Optional, Dict
 import aiohttp
 from numo.domain.interfaces.numo_runner import NumoRunner
+import time
 
 
 class CurrencyRunner(NumoRunner):
@@ -17,6 +18,7 @@ class CurrencyRunner(NumoRunner):
         self._api_url = "https://api.exchangerate-api.com/v4/latest/USD"
         self._rates: Dict[str, float] = {}
         self._last_update = 0
+        self._cache_duration = 24 * 60 * 60  # 24 saat (saniye cinsinden)
 
     async def run(self, source: str) -> Optional[str]:
         """
@@ -66,31 +68,44 @@ class CurrencyRunner(NumoRunner):
     async def _get_exchange_rates(self) -> Optional[Dict[str, float]]:
         """
         Fetch current exchange rates from API.
+        Uses cached rates if they are still valid.
 
         Returns:
             dict: Exchange rates if successful
             None: For any error
         """
+        current_time = time.time()
+
+        # Cache'lenmiş veri varsa ve süresi geçmediyse onu kullan
+        if self._rates and (current_time - self._last_update) < self._cache_duration:
+            return self._rates
+
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(self._api_url) as response:
                     if response.status != 200:
-                        return None
+                        # Cache boş değilse, hata durumunda cache'i kullan
+                        return self._rates if self._rates else None
 
                     data = await response.json()
                     if not data or "rates" not in data:
-                        return None
+                        return self._rates if self._rates else None
 
                     rates = data["rates"]
                     if not isinstance(rates, dict):
-                        return None
+                        return self._rates if self._rates else None
 
                     # Add base currency
                     rates["USD"] = 1.0
+
+                    # Cache'i güncelle
+                    self._rates = rates
+                    self._last_update = current_time
                     return rates
 
         except:  # Catch absolutely everything
-            return None
+            # Hata durumunda eğer cache varsa onu kullan
+            return self._rates if self._rates else None
 
     def _format_result(self, value: float, currency: str) -> str:
         """Format currency amount with 2 decimal places and currency code."""
