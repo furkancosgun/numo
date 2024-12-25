@@ -39,21 +39,6 @@ pip install numo
 
 ## Usage 🚀
 
-### Command Line Interface
-
-```bash
-# Interactive mode
-numo
-
-# Single expression
-numo -e "2 + 2"
-
-# Process file
-numo -f expressions.txt
-```
-
-### Python Library
-
 ```python
 from numo import Numo
 import asyncio
@@ -136,8 +121,8 @@ numo.add_variable("pi", 3.14159)
 git clone https://github.com/furkancosgun/numo.git
 cd numo
 
-# Install test dependencies
-pip install -e ".[test]"
+# Install dependencies
+pip install -r requirements.txt
 
 # Run tests
 pytest
@@ -150,8 +135,7 @@ numo/
 ├── src/
 │   ├── application/     # Core business logic
 │   ├── domain/         # Business rules
-│   ├── infrastructure/ # External interfaces
-│   └── presentation/   # User interfaces
+│   └── infrastructure/ # External interfaces
 └── tests/             # Test suite
 ```
 
