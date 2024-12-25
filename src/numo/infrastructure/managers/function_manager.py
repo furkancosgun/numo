@@ -1,7 +1,7 @@
+from typing import Dict,Callable, Any, List
 import re
 import math
-from typing import Dict, Callable, List, Any
-from src.domain.interfaces.numo_manager import NumoManager
+from numo.domain.interfaces.numo_manager import NumoManager
 
 class FunctionManager(NumoManager):
     def __init__(self):

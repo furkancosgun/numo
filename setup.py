@@ -5,14 +5,15 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="numo",
-    version="0.1.3",
+    version="0.1.4",
     author="Furkan Cosgun",
     author_email="furkan51cosgun@gmail.com",
     description="A Python package for numerical operations and conversions",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/furkancosgun/numo",
-    packages=find_packages(),
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -29,6 +30,6 @@ setup(
         "typing-extensions>=4.7.1",
     ],
     package_data={
-        'src.infrastructure.runners.units': ['data/*.json'],
+        'numo.infrastructure.runners.units': ['data/*.json'],
     },
 ) 

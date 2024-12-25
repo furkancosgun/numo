@@ -2,7 +2,7 @@ import re
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 import aiohttp
-from src.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_runner import NumoRunner
 
 class CurrencyRunner(NumoRunner):
     def __init__(self):

@@ -1,5 +1,5 @@
 import pytest
-from src.application.numo import Numo
+from numo.application.numo import Numo
 
 @pytest.fixture
 def numo():

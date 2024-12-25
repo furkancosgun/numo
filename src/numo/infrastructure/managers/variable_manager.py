@@ -1,6 +1,6 @@
 import re
-from typing import Dict, Any
-from src.domain.interfaces.numo_manager import NumoManager
+from typing import Any, Dict
+from numo.domain.interfaces.numo_manager import NumoManager
 
 class VariableManager(NumoManager):
     def __init__(self):

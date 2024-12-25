@@ -1,8 +1,8 @@
 import re
 import aiohttp
 from typing import Dict, Optional
-from src.domain.interfaces.numo_runner import NumoRunner
-from src.infrastructure.runners.units import languages
+from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.infrastructure.runners.units import languages
 
 class TranslateRunner(NumoRunner):
     def __init__(self):

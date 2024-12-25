@@ -1,6 +1,6 @@
 import re
 from typing import Optional
-from src.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_runner import NumoRunner
 
 class MathRunner(NumoRunner):
     def __init__(self):

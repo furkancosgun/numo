@@ -1,8 +1,8 @@
 from typing import List, Optional, Callable, Any
-from src.domain.interfaces.numo_manager import NumoManager
-from src.domain.interfaces.numo_runner import NumoRunner
-from src.infrastructure.managers import VariableManager, FunctionManager
-from src.infrastructure.runners import (
+from numo.domain.interfaces.numo_manager import NumoManager
+from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.infrastructure.managers import VariableManager, FunctionManager
+from numo.infrastructure.runners import (
     TranslateRunner,
     UnitRunner,
     CurrencyRunner,

@@ -1,10 +1,15 @@
 import re
 from typing import Dict, Optional
-from src.domain.interfaces.numo_runner import NumoRunner
-from src.infrastructure.runners.units import (
-    angular_units, area_units, length_units,
-    speed_units, storage_units, time_units,
-    volume_units, weight_units
+from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.infrastructure.runners.units import (
+    angular_units,
+    area_units,
+    length_units,
+    speed_units,
+    storage_units,
+    time_units,
+    volume_units,
+    weight_units
 )
 
 class UnitRunner(NumoRunner):
