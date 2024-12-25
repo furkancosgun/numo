@@ -1,11 +1,21 @@
+import os
+import re
 from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
+    
+def get_version():
+    init_path = os.path.join("src", "numo", "__init__.py")
+    with open(init_path, "r", encoding="utf-8") as f:
+        version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M)
+        if version_match:
+            return version_match.group(1)
+    raise RuntimeError("Version string not found")
 
 setup(
     name="numo",
-    version="0.1.4",
+    version=get_version(),
     author="Furkan Cosgun",
     author_email="furkan51cosgun@gmail.com",
     description="A Python package for numerical operations and conversions",
