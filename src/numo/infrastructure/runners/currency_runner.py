@@ -1,104 +1,100 @@
 import re
-from datetime import datetime, timedelta
-from typing import Dict, Optional
+from typing import Optional, Dict
 import aiohttp
-from src.numo.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_runner import NumoRunner
 
 
 class CurrencyRunner(NumoRunner):
+    """
+    Runner for converting between different currencies.
+    Uses external exchange rate API for conversions.
+    Never raises exceptions - returns None for any error condition.
+    """
+
     def __init__(self):
-        self._pattern = r"(\d+(\.\d+)?)\s*([a-zA-Z]+)\s*to\s*([a-zA-Z]+)"
+        """Initialize with currency pattern and API settings."""
+        self._pattern = r"^(\d+(?:\.\d+)?)\s*([A-Za-z]{3})\s*to\s*([A-Za-z]{3})$"
         self._api_url = "https://api.exchangerate-api.com/v4/latest/USD"
-        self._exchange_rates: Dict[str, float] = {}
-        self._last_update: Optional[datetime] = None
-        self._update_interval = timedelta(hours=1)
+        self._rates: Dict[str, float] = {}
+        self._last_update = 0
 
     async def run(self, source: str) -> Optional[str]:
         """
-        Convert between currencies using real-time exchange rates.
+        Convert amount between currencies.
 
         Args:
-            source: Input string in format "amount currency_from to currency_to"
+            source: Input in format: [amount] [from_currency] to [to_currency]
 
         Returns:
-            Converted amount string if successful, None if failed
+            str: Converted amount if successful
+            None: For any error or invalid input
+
+        Example:
+            >>> runner = CurrencyRunner()
+            >>> await runner.run("100 USD to EUR")  # Returns "85.23 EUR"
+            >>> await runner.run("invalid")  # Returns None
         """
-        match = re.match(self._pattern, source)
-        if not match:
+        if not source or not isinstance(source, str):
             return None
 
         try:
-            await self._update_exchange_rates_if_needed()
+            # Parse conversion request
+            match = re.match(self._pattern, source, re.IGNORECASE)
+            if not match:
+                return None
 
             amount = float(match.group(1))
-            from_currency = match.group(3).upper()
-            to_currency = match.group(4).upper()
+            from_curr = match.group(2).upper()
+            to_curr = match.group(3).upper()
 
-            converted_amount = self._convert_currency(
-                amount, from_currency, to_currency
-            )
-            if converted_amount is not None:
-                return str(converted_amount)
+            # Get exchange rates
+            rates = await self._get_exchange_rates()
+            if not rates:
+                return None
 
-        except Exception:
-            pass
+            # Validate currencies
+            if from_curr not in rates or to_curr not in rates:
+                return None
 
-        return None
+            # Convert amount
+            result = amount * (rates[to_curr] / rates[from_curr])
+            return self._format_result(result, to_curr)
 
-    async def _update_exchange_rates_if_needed(self) -> None:
-        """
-        Update exchange rates if they are outdated or not loaded.
+        except:  # Catch absolutely everything
+            return None
 
-        Raises:
-            Exception: If exchange rates cannot be updated
-        """
-        now = datetime.now()
-        if (
-            not self._exchange_rates
-            or not self._last_update
-            or now - self._last_update > self._update_interval
-        ):
-
-            await self._fetch_exchange_rates()
-
-    async def _fetch_exchange_rates(self) -> None:
+    async def _get_exchange_rates(self) -> Optional[Dict[str, float]]:
         """
         Fetch current exchange rates from API.
 
-        Raises:
-            Exception: If API request fails
-        """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self._api_url) as response:
-                if response.status != 200:
-                    raise Exception("Failed to update exchange rates")
-
-                data = await response.json()
-                self._exchange_rates = data["rates"]
-                self._last_update = datetime.now()
-
-    def _convert_currency(
-        self, amount: float, from_currency: str, to_currency: str
-    ) -> Optional[float]:
-        """
-        Convert amount between currencies using current exchange rates.
-
-        Args:
-            amount: Amount to convert
-            from_currency: Source currency code
-            to_currency: Target currency code
-
         Returns:
-            Converted amount if conversion is possible, None otherwise
+            dict: Exchange rates if successful
+            None: For any error
         """
-        if (
-            from_currency in self._exchange_rates
-            and to_currency in self._exchange_rates
-        ):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self._api_url) as response:
+                    if response.status != 200:
+                        return None
 
-            from_rate = self._exchange_rates[from_currency]
-            to_rate = self._exchange_rates[to_currency]
+                    data = await response.json()
+                    if not data or "rates" not in data:
+                        return None
 
-            return amount * (to_rate / from_rate)
+                    rates = data["rates"]
+                    if not isinstance(rates, dict):
+                        return None
 
-        return None
+                    # Add base currency
+                    rates["USD"] = 1.0
+                    return rates
+
+        except:  # Catch absolutely everything
+            return None
+
+    def _format_result(self, value: float, currency: str) -> str:
+        """Format currency amount with 2 decimal places and currency code."""
+        try:
+            return f"{value:.2f} {currency}"
+        except:
+            return str(value)

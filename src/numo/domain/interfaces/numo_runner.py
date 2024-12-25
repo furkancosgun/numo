@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Any
 
 
 class NumoRunner(ABC):
@@ -15,6 +15,10 @@ class NumoRunner(ABC):
 
     Each runner specializes in a specific domain and implements the run method
     to handle operations within that domain.
+
+    Important: Runners should never raise exceptions. They should return:
+    - str: For successful operations
+    - None: For any error or invalid input
     """
 
     @abstractmethod
@@ -26,7 +30,8 @@ class NumoRunner(ABC):
             source: Preprocessed input string ready for execution
 
         Returns:
-            Result of the operation if successful, None if operation failed
+            str: Result as string if successful
+            None: For any error or invalid input
 
         Example:
             >>> runner = MathRunner()
@@ -34,3 +39,22 @@ class NumoRunner(ABC):
             >>> await runner.run("invalid")  # Returns None
         """
         pass
+
+    def _format_result(self, value: Any) -> Optional[str]:
+        """
+        Safely format any value to string or None.
+
+        Args:
+            value: Value to convert to string
+
+        Returns:
+            str: If value can be safely converted to string
+            None: If value cannot be converted or is invalid
+        """
+        if value is None:
+            return None
+
+        try:
+            return str(value)
+        except:  # Catch absolutely everything
+            return None

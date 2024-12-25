@@ -1,3 +1,6 @@
+import re
+
+
 class MathService:
     """
     Service class for handling mathematical operations.
@@ -7,5 +10,13 @@ class MathService:
 
     @staticmethod
     def safe_eval(expression: str) -> float:
-        expression = expression.replace("^", "**")
-        return eval(expression, {"__builtins__": {}}, {})
+        """
+        Safely evaluate a mathematical expression.
+        """
+        try:
+            if not re.match(MathService.pattern, expression):
+                return None
+            expression = expression.replace("^", "**")
+            return float(eval(expression, {"__builtins__": {}}, {}))
+        except:
+            return None

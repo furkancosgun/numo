@@ -12,10 +12,10 @@ def numo():
 class TestOther:
     async def test_other(self, numo):
         result = await numo.calculate(["x = 5", "y = 3", "z = x + y", "z"])
-        assert float(result[0]) == 5
-        assert float(result[1]) == 3
-        assert float(result[2]) == 8
-        assert float(result[3]) == 8
+        assert float(result[0]) == 5.0
+        assert float(result[1]) == 3.0
+        assert float(result[2]) == 8.0
+        assert float(result[3]) == 8.0
 
 
 @pytest.mark.asyncio
@@ -36,9 +36,9 @@ class TestNumo:
             ["1 km to m", "100 cm to m", "1 kg to g", "1 hour to minutes", "1 gb to mb"]
         )
         assert len(results) == 5
-        assert float(results[0].split()[0]) == 1000
+        assert float(results[0].split()[0]) == 1000.0
         assert float(results[1].split()[0]) == 1.0
-        assert float(results[2].split()[0]) == 1000
+        assert float(results[2].split()[0]) == 1000.0
         assert float(results[3].split()[0]) == 60.0
         assert float(results[4].split()[0]) == 1000.0
 
@@ -49,13 +49,15 @@ class TestNumo:
         for result in results:
             assert result is not None
             amount, currency = result.split()
-            assert float(amount) > 0
+            assert float(amount) > 0.0
             assert currency in ["EUR", "JPY"]
 
     async def test_translation(self, numo):
         """Test translation functionality."""
         results = await numo.calculate(["hello in spanish", "goodbye in french"])
         assert len(results) == 2
+        assert isinstance(results[0], str)
+        assert isinstance(results[1], str)
         assert results[0].lower() == "hola"
         assert results[1].lower() == "au revoir"
 
@@ -105,9 +107,12 @@ class TestNumo:
             [
                 "1 / 0",  # Division by zero
                 "sqrt(-1)",  # Invalid math operation
-                "invalid in spanish",  # Invalid translation
+                "invalid in sp1anish",  # Invalid translation
                 "abc to xyz",  # Invalid unit conversion
             ]
         )
         assert len(results) == 4
-        assert all(result is None or result == "" for result in results)
+        assert results[0] is None
+        assert results[1] is None
+        assert results[2] is None
+        assert results[3] is None

@@ -1,13 +1,15 @@
-from typing import Optional
+from typing import Optional, Any
 import ast
 import operator
-from src.numo.domain.interfaces.numo_runner import NumoRunner
+from numo.services.math_service import MathService
+from numo.domain.interfaces.numo_runner import NumoRunner
 
 
 class MathRunner(NumoRunner):
     """
     Runner for safely evaluating mathematical expressions.
     Uses AST-based evaluation instead of eval() for security.
+    Never raises exceptions - returns None for any error condition.
     """
 
     # Supported operators and their implementations
@@ -34,40 +36,36 @@ class MathRunner(NumoRunner):
             source: Mathematical expression to evaluate
 
         Returns:
-            Result as string if successful, None if invalid
+            str: Result as string if successful
+            None: For any error or invalid input
 
         Example:
             >>> runner = MathRunner()
             >>> await runner.run("2 + 2")  # Returns "4"
             >>> await runner.run("1 / 0")  # Returns None
         """
+        return MathService.safe_eval(source)
+
+        # Basic validation
+        if not source or not isinstance(source, str):
+            return None
+
+        if len(source) > self._max_length:
+            return None
+
         try:
-            # Basic validation
-            if not source or not isinstance(source, str):
-                return None
-
-            if len(source) > self._max_length:
-                return None
-
             # Parse and evaluate
             node = ast.parse(source, mode="eval")
             if not self._is_safe_ast(node):
                 return None
 
             result = self._evaluate_node(node.body)
-
-            # Validate result
-            if not isinstance(result, (int, float)) or not self._is_valid_number(
-                result
-            ):
+            if result is None:
                 return None
 
-            return str(result)
+            return self._format_result(result)
 
-        except (SyntaxError, ValueError, ZeroDivisionError, OverflowError):
-            return None
-        except Exception:
-            # Catch all other exceptions but don't expose details
+        except:  # Catch absolutely everything
             return None
 
     def _is_safe_ast(self, node: ast.AST, depth: int = 0) -> bool:
@@ -81,33 +79,38 @@ class MathRunner(NumoRunner):
         Returns:
             True if AST is safe, False otherwise
         """
-        if depth > self._max_depth:
+        try:
+            if depth > self._max_depth:
+                return False
+
+            # Only allow specific node types
+            allowed = (
+                ast.Expression,
+                ast.Num,
+                ast.Constant,
+                ast.BinOp,
+                ast.UnaryOp,
+                ast.Add,
+                ast.Sub,
+                ast.Mult,
+                ast.Div,
+                ast.Pow,
+                ast.Mod,
+                ast.USub,
+            )
+
+            if not isinstance(node, allowed):
+                return False
+
+            return all(
+                self._is_safe_ast(child, depth + 1)
+                for child in ast.iter_child_nodes(node)
+            )
+
+        except:  # Catch absolutely everything
             return False
 
-        # Only allow specific node types
-        allowed = (
-            ast.Expression,
-            ast.Num,
-            ast.Constant,
-            ast.BinOp,
-            ast.UnaryOp,
-            ast.Add,
-            ast.Sub,
-            ast.Mult,
-            ast.Div,
-            ast.Pow,
-            ast.Mod,
-            ast.USub,
-        )
-
-        if not isinstance(node, allowed):
-            return False
-
-        return all(
-            self._is_safe_ast(child, depth + 1) for child in ast.iter_child_nodes(node)
-        )
-
-    def _evaluate_node(self, node: ast.AST) -> float:
+    def _evaluate_node(self, node: Any) -> Optional[float]:
         """
         Recursively evaluate an AST node.
 
@@ -115,37 +118,53 @@ class MathRunner(NumoRunner):
             node: AST node to evaluate
 
         Returns:
-            Calculated result
-
-        Raises:
-            ValueError: If node type is not supported
+            float: Calculated result if successful
+            None: For any error or invalid input
         """
-        if isinstance(node, (ast.Num, ast.Constant)):
-            return float(node.n)
+        try:
+            if isinstance(node, (ast.Num, ast.Constant)):
+                return float(node.n)
 
-        elif isinstance(node, ast.BinOp):
-            left = self._evaluate_node(node.left)
-            right = self._evaluate_node(node.right)
+            elif isinstance(node, ast.BinOp):
+                left = self._evaluate_node(node.left)
+                if left is None:
+                    return None
 
-            if isinstance(node.op, ast.Pow) and (right > 100 or right < -100):
-                raise ValueError("Exponent too large")
+                right = self._evaluate_node(node.right)
+                if right is None:
+                    return None
 
-            op = self.OPERATORS.get(type(node.op))
-            if op is None:
-                raise ValueError(f"Unsupported operation: {type(node.op)}")
+                op = self.OPERATORS.get(type(node.op))
+                if op is None:
+                    return None
 
-            return op(left, right)
+                try:
+                    # Special handling for power operation
+                    if isinstance(node.op, ast.Pow):
+                        if abs(right) > 100:  # Limit for large exponents
+                            return None
+                        result = op(left, right)
+                        if isinstance(result, complex):  # Prevent complex numbers
+                            return None
+                        return float(result)
+                    return float(op(left, right))
+                except:
+                    return None
 
-        elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
-            return -self._evaluate_node(node.operand)
+            elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+                value = self._evaluate_node(node.operand)
+                if value is None:
+                    return None
+                return -value
 
-        raise ValueError(f"Unsupported node type: {type(node)}")
+            return None
 
-    def _is_valid_number(self, value: float) -> bool:
-        """Check if number is within valid range."""
-        return (
-            isinstance(value, (int, float))
-            and not (value != value)  # Check for NaN
-            and abs(value) <= 1e308  # Max float value
-            and (abs(value) >= 1e-308 or value == 0)  # Min float value or zero
-        )
+        except:  # Catch absolutely everything
+            return None
+
+    def _format_result(self, value: float) -> str:
+        """Format the result as a string with one decimal place."""
+        try:
+            return f"{float(value):.2f}"
+        except:
+            return str(value)

@@ -1,111 +1,137 @@
 import re
+from typing import Optional
 import aiohttp
-from typing import Dict, Optional
-from src.numo.domain.interfaces.numo_runner import NumoRunner
-from src.numo.infrastructure.runners.units import languages
+from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.infrastructure.runners.units import languages
 
 
 class TranslateRunner(NumoRunner):
+    """
+    Runner for translating text between different languages.
+    Uses external translation API for translations.
+    Never raises exceptions - returns None for any error condition.
+    """
+
     def __init__(self):
-        self._pattern = r"(\w+(?:\s+\w+)*)\s+in\s+(\w+)"
-        self._base_url = "https://translate.googleapis.com/translate_a/single"
+        """Initialize with translation pattern and language codes."""
+        self._pattern = r"^(.+?)\s+in\s+([a-zA-Z-]+)$"
+        self._languages = languages
+        self._api_url = "https://translate.googleapis.com/translate_a/single"
 
-    def _get_language_code(self, language: str) -> Optional[str]:
-        """
-        Get ISO language code from language name.
-
-        Args:
-            language: Language name (e.g., 'turkish', 'spanish')
-
-        Returns:
-            Language code (e.g., 'tr', 'es') if found, None otherwise
-        """
-        language = language.lower()
-
-        # If it's a valid language code, return it
-        if language in languages:
-            return language
-
-        # Search for language name in the languages data
-        for code, name in languages.items():
-            if language in name.lower():
-                return code
-        return None
+    def _is_valid_language(self, lang_code: str) -> bool:
+        """Check if a language code is supported."""
+        try:
+            # Check if it's a language name (partial match)
+            lang_code = lang_code.lower()
+            for code, name in self._languages.items():
+                if lang_code in name.lower() or name.lower() in lang_code:
+                    return True
+            # Check if it's a language code
+            return lang_code in self._languages
+        except:
+            return False
 
     async def run(self, source: str) -> Optional[str]:
         """
-        Translate text to specified target language.
+        Translate text between languages.
 
         Args:
-            source: Input string in format "text in language"
+            source: Input in format: "text in language"
 
         Returns:
-            Translated text if successful, None otherwise
+            str: Translated text if successful
+            None: For any error or invalid input
+
+        Example:
+            >>> runner = TranslateRunner()
+            >>> await runner.run('hello in spanish')  # Returns "hola"
+            >>> await runner.run('invalid')  # Returns None
         """
-        match = re.match(self._pattern, source)
-        if not match:
-            return None
-
-        text = match.group(1)
-        target_lang = match.group(2)
-
-        lang_code = self._get_language_code(target_lang)
-        if not lang_code:
+        if not source or not isinstance(source, str):
             return None
 
         try:
-            return await self._translate_text(text, lang_code)
-        except Exception:
+            # Parse translation request
+            match = re.match(self._pattern, source, re.IGNORECASE)
+            if not match:
+                return None
+
+            text = match.group(1)
+            to_lang = match.group(2).lower()
+
+            # Validate language
+            if not self._is_valid_language(to_lang):
+                return None
+
+            # Get language code
+            target_lang = self._get_language_code(to_lang)
+            if not target_lang:
+                return None
+
+            # Perform translation
+            translated = await self._translate_text(text, "auto", target_lang)
+            if translated:
+                return translated.lower()
             return None
 
-    async def _translate_text(self, text: str, target_lang: str) -> str:
+        except:  # Catch absolutely everything
+            return None
+
+    def _get_language_code(self, language: str) -> Optional[str]:
+        """Convert language name to ISO code."""
+        try:
+            language = language.lower()
+            # If it's already a code
+            if language in self._languages:
+                return language
+            # If it's a language name (partial match)
+            for code, name in self._languages.items():
+                if language in name.lower() or name.lower() in language:
+                    return code
+            return None
+        except:
+            return None
+
+    async def _translate_text(
+        self, text: str, from_lang: str, to_lang: str
+    ) -> Optional[str]:
         """
-        Call Google Translate API to translate text.
+        Translate text using translation API.
 
         Args:
-            text: Source text to translate
-            target_lang: Target language code
+            text: Text to translate
+            from_lang: Source language code
+            to_lang: Target language code
 
         Returns:
-            Translated text
-
-        Raises:
-            Exception: If translation fails or response is invalid
+            str: Translated text if successful
+            None: For any error
         """
-        params: Dict[str, str] = {
-            "client": "gtx",
-            "sl": "auto",  # Source language auto-detection
-            "tl": target_lang,
-            "dt": "t",  # Return translated text
-            "q": text,
-        }
+        try:
+            params = {
+                "client": "gtx",
+                "sl": from_lang,
+                "tl": to_lang,
+                "dt": "t",
+                "q": text,
+            }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self._base_url, params=params) as response:
-                if response.status != 200:
-                    raise Exception(f"Translation failed: HTTP {response.status}")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self._api_url, params=params) as response:
+                    if response.status != 200:
+                        return None
 
-                data = await response.json()
-                if not self._is_valid_translation_response(data):
-                    raise Exception("Invalid translation response format")
+                    data = await response.json()
+                    if not data or not isinstance(data, list):
+                        return None
 
-                return data[0][0][0]
+                    # Extract translated text from response
+                    translated = ""
+                    for item in data[0]:
+                        if item and isinstance(item, list) and len(item) > 0:
+                            translated += item[0]
 
-    def _is_valid_translation_response(self, data: list) -> bool:
-        """
-        Validate translation API response format.
+                    return translated if translated else None
 
-        Args:
-            data: Response data from translation API
-
-        Returns:
-            True if response format is valid, False otherwise
-        """
-        return (
-            isinstance(data, list)
-            and len(data) > 0
-            and isinstance(data[0], list)
-            and len(data[0]) > 0
-            and isinstance(data[0][0], list)
-            and len(data[0][0]) > 0
-        )
+        except:  # Catch absolutely everything
+            return None

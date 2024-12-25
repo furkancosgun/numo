@@ -1,8 +1,8 @@
 from typing import List, Optional, Callable, Any
-from src.numo.domain.interfaces.numo_manager import NumoManager
-from src.numo.domain.interfaces.numo_runner import NumoRunner
-from src.numo.infrastructure.managers import VariableManager, FunctionManager
-from src.numo.infrastructure.runners import (
+from numo.domain.interfaces.numo_manager import NumoManager
+from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.infrastructure.managers import VariableManager, FunctionManager
+from numo.infrastructure.runners import (
     TranslateRunner,
     UnitRunner,
     CurrencyRunner,
@@ -13,7 +13,10 @@ from src.numo.infrastructure.runners import (
 
 class Numo:
     def __init__(self):
-        self._managers: List[NumoManager] = [VariableManager(), FunctionManager()]
+        self._managers: List[NumoManager] = [
+            VariableManager(),
+            FunctionManager(),
+        ]
 
         self._runners: List[NumoRunner] = [
             TranslateRunner(),
@@ -50,7 +53,8 @@ class Numo:
                 if runner_result:
                     result = runner_result
                     break
-
+            if isinstance(result, float):
+                result = float(f"{result:.2f}")
             results.append(result)
 
         return results

@@ -1,7 +1,7 @@
 import re
 from typing import Optional
-from src.numo.services.math_service import MathService
-from src.numo.domain.interfaces.numo_runner import NumoRunner
+from numo.services.math_service import MathService
+from numo.domain.interfaces.numo_runner import NumoRunner
 
 
 class VariableRunner(NumoRunner):
