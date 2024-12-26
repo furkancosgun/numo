@@ -6,7 +6,7 @@ class NumoManager(ABC):
     Abstract base class for all managers in the Numo system.
 
     Managers are responsible for preprocessing and transforming input strings
-    before they are passed to runners for execution. They handle tasks such as:
+    before they are passed to modules for execution. They handle tasks such as:
     - Variable substitution
     - Function resolution
     - Syntax transformation

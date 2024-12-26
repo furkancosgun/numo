@@ -43,6 +43,9 @@ setup(
     ],
     include_package_data=True,
     package_data={
-        "numo": ["infrastructure/runners/units/data/*.json"],
+        "numo": [
+            "infrastructure/modules/units/data/*.json",
+            "infrastructure/modules/languages/data/*.json",
+        ],
     },
 )
