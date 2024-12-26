@@ -118,8 +118,8 @@ await numo.calculate("2 * (3 + 4)")  # Returns: "14.00"
 await numo.calculate("sin(pi/2)")    # Returns: "1.00"
 
 # Unit conversions
-await numo.calculate("5.5 km in miles")  # Returns: "3.42 miles"
-await numo.calculate("100 MB in GB")     # Returns: "0.10 GB"
+await numo.calculate("5.5 km to miles")  # Returns: "3.42 miles"
+await numo.calculate("100 MB to GB")     # Returns: "0.10 GB"
 
 # Language translation
 await numo.calculate("Hello world in spanish")  # Returns: "hola mundo"
@@ -159,28 +159,28 @@ percent_change(100, 150)  # Returns: 50.00
 ### 📏 Unit Conversions
 ```python
 # Length & Distance
-"5.5 meters in feet"      # Returns: 18.04 feet
-"1 mile in kilometers"    # Returns: 1.61 kilometers
-"100 yards in meters"     # Returns: 91.44 meters
+"5.5 meters to feet"      # Returns: 18.04 feet
+"1 mile to kilometers"    # Returns: 1.61 kilometers
+"100 yards to meters"     # Returns: 91.44 meters
 
 # Weight & Mass
-"150 pounds in kg"        # Returns: 68.04 kg
-"1000 grams in ounces"    # Returns: 35.27 ounces
-"2 tons in kilograms"     # Returns: 1814.37 kilograms
+"150 pounds to kg"        # Returns: 68.04 kg
+"1000 grams to ounces"    # Returns: 35.27 ounces
+"2 tons to kilograms"     # Returns: 1814.37 kilograms
 
 # Digital Storage
-"1.5 GB in MB"           # Returns: 1536.00 MB
-"1 TiB in GiB"           # Returns: 1024.00 GiB
-"500 MB in bytes"        # Returns: 524288000 bytes
+"1.5 GB to MB"           # Returns: 1536.00 MB
+"1 TiB to GiB"           # Returns: 1024.00 GiB
+"500 MB to bytes"        # Returns: 524288000 bytes
 
 # Data Transfer Rates
-"100 Mbps in Gbps"       # Returns: 0.10 Gbps
-"1 GBps in Mbps"         # Returns: 8192.00 Mbps
+"100 Mbps to Gbps"       # Returns: 0.10 Gbps
+"1 GBps to Mbps"         # Returns: 8192.00 Mbps
 
 # Scientific Units
-"1 bar in psi"           # Returns: 14.50 psi
-"760 mmHg in atm"        # Returns: 1.00 atm
-"100 hp in kW"           # Returns: 74.57 kW
+"1 bar to psi"           # Returns: 14.50 psi
+"760 mmHg to atm"        # Returns: 1.00 atm
+"100 hp to kW"           # Returns: 74.57 kW
 ```
 
 ## 🤝 Contributing
