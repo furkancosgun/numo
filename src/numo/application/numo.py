@@ -39,6 +39,41 @@ class Numo:
         processed_sources = self._preprocess_input_lines(lines)
         return await self._execute_runners(processed_sources)
 
+    def get_available_functions(self) -> List[str]:
+        """
+        Get a list of all available mathematical functions.
+
+        Returns:
+            List of function names sorted alphabetically.
+
+        Example:
+            >>> numo = Numo()
+            >>> numo.get_available_functions()
+            ['abs', 'acos', 'asin', 'atan', 'ceil', 'cos', 'exp', 'fact', ...]
+        """
+        function_manager = next(
+            m for m in self._managers if isinstance(m, FunctionManager)
+        )
+        return function_manager.get_available_functions()
+
+    def get_available_variables(self) -> List[str]:
+        """
+        Get a list of all available variables and constants.
+
+        Returns:
+            List of variable names sorted alphabetically, including both
+            user-defined variables and built-in constants.
+
+        Example:
+            >>> numo = Numo()
+            >>> numo.get_available_variables()
+            ['deg30', 'deg45', 'deg90', 'e', 'phi', 'pi', 'sqrt2', ...]
+        """
+        variable_manager = next(
+            m for m in self._managers if isinstance(m, VariableManager)
+        )
+        return variable_manager.get_available_variables()
+
     async def _execute_runners(self, sources: List[str]) -> List[Optional[str]]:
         results = []
 

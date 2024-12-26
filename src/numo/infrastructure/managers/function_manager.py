@@ -99,16 +99,64 @@ class FunctionManager(NumoManager):
             self._functions.update(
                 {
                     # Basic Math Functions
-                    "nabs": lambda params: abs(float(params[0])),
-                    "nround": lambda params: round(float(params[0])),
-                    "nfloor": lambda params: math.floor(float(params[0])),
-                    "nceil": lambda params: math.ceil(float(params[0])),
+                    "abs": lambda params: abs(float(params[0])),
+                    "round": lambda params: round(float(params[0])),
+                    "floor": lambda params: math.floor(float(params[0])),
+                    "ceil": lambda params: math.ceil(float(params[0])),
                     # Statistical Functions
-                    "nsum": lambda params: sum(float(p) for p in params),
-                    "navg": lambda params: sum(float(p) for p in params) / len(params),
-                    "nmin": lambda params: min(float(p) for p in params),
-                    "nmax": lambda params: max(float(p) for p in params),
+                    "sum": lambda params: sum(float(p) for p in params),
+                    "avg": lambda params: sum(float(p) for p in params) / len(params),
+                    "min": lambda params: min(float(p) for p in params),
+                    "max": lambda params: max(float(p) for p in params),
+                    # Trigonometric Functions
+                    "sin": lambda params: math.sin(float(params[0])),
+                    "cos": lambda params: math.cos(float(params[0])),
+                    "tan": lambda params: math.tan(float(params[0])),
+                    "asin": lambda params: math.asin(float(params[0])),
+                    "acos": lambda params: math.acos(float(params[0])),
+                    "atan": lambda params: math.atan(float(params[0])),
+                    # Power and Logarithmic Functions
+                    "pow": lambda params: math.pow(float(params[0]), float(params[1])),
+                    "sqrt": lambda params: math.sqrt(float(params[0])),
+                    "log": lambda params: math.log(float(params[0])),
+                    "log10": lambda params: math.log10(float(params[0])),
+                    "exp": lambda params: math.exp(float(params[0])),
+                    # Additional Statistical Functions
+                    "median": lambda params: sorted([float(p) for p in params])[
+                        len(params) // 2
+                    ],
+                    "var": lambda params: sum(
+                        (float(x) - sum(float(p) for p in params) / len(params)) ** 2
+                        for x in params
+                    )
+                    / len(params),
+                    "std": lambda params: math.sqrt(
+                        sum(
+                            (float(x) - sum(float(p) for p in params) / len(params))
+                            ** 2
+                            for x in params
+                        )
+                        / len(params)
+                    ),
+                    # Additional Math Functions
+                    "fact": lambda params: math.factorial(int(float(params[0]))),
+                    "gcd": lambda params: math.gcd(
+                        int(float(params[0])), int(float(params[1]))
+                    ),
+                    "mod": lambda params: float(params[0]) % float(params[1]),
                 }
             )
         except:  # Catch absolutely everything
             pass
+
+    def get_available_functions(self) -> list[str]:
+        """
+        Get a list of all available function names.
+
+        Returns:
+            List of function names sorted alphabetically.
+        """
+        try:
+            return sorted(list(self._functions.keys()))
+        except:  # Catch absolutely everything
+            return []

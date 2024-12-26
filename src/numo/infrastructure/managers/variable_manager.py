@@ -1,5 +1,6 @@
 from typing import Dict, Optional, Tuple
 from numo.domain.interfaces.numo_manager import NumoManager
+import math
 
 
 class VariableManager(NumoManager):
@@ -156,14 +157,36 @@ class VariableManager(NumoManager):
             return False
 
     def _initialize_operators(self) -> None:
-        """Initialize mathematical operator aliases."""
+        """Initialize mathematical operator aliases and constants."""
         try:
+            # Initialize operators and their aliases
             for operator, aliases in self._operators.items():
                 # Store operator itself
                 self._variables[operator] = operator
                 # Store all aliases
                 for alias in aliases:
                     self._variables[alias.lower()] = operator
+
+            # Mathematical constants
+            self._variables.update(
+                {
+                    # Basic mathematical constants
+                    "pi": str(math.pi),
+                    "e": str(math.e),
+                    "tau": str(math.tau),  # 2π
+                    # Common fractions as decimals
+                    "phi": str((1 + math.sqrt(5)) / 2),  # Golden ratio
+                    "sqrt2": str(math.sqrt(2)),
+                    "sqrt3": str(math.sqrt(3)),
+                    # Common angles in radians
+                    "deg30": str(math.pi / 6),
+                    "deg45": str(math.pi / 4),
+                    "deg60": str(math.pi / 3),
+                    "deg90": str(math.pi / 2),
+                    "deg180": str(math.pi),
+                    "deg360": str(2 * math.pi),
+                }
+            )
         except:  # Catch absolutely everything
             pass
 
@@ -194,3 +217,16 @@ class VariableManager(NumoManager):
             self._variables = operators
         except:  # Catch absolutely everything
             pass
+
+    def get_available_variables(self) -> list[str]:
+        """
+        Get a list of all available variable names.
+
+        Returns:
+            List of variable names sorted alphabetically, including both
+            user-defined variables and built-in constants.
+        """
+        try:
+            return sorted(list(self._variables.keys()))
+        except:  # Catch absolutely everything
+            return []
