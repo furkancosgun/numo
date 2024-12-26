@@ -1,29 +1,49 @@
-from typing import List, Optional, Callable, Any
+from typing import List, Optional, Callable, Any, Type
 from numo.domain.interfaces.numo_manager import NumoManager
-from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_module import NumoModule
 from numo.infrastructure.managers import VariableManager, FunctionManager
-from numo.infrastructure.runners import (
-    TranslateRunner,
-    UnitRunner,
-    CurrencyRunner,
-    MathRunner,
-    VariableRunner,
+from numo.infrastructure.modules import (
+    TranslateModule,
+    UnitModule,
+    CurrencyModule,
+    MathModule,
+    VariableModule,
 )
 
 
 class Numo:
+    """
+    Numo: A comprehensive mathematical and conversion engine.
+
+    Features:
+    - Mathematical operations and functions
+    - Unit conversions (length, weight, time, etc.)
+    - Currency conversions with real-time rates
+    - Language translations
+    - Variable management
+    - Custom module support
+
+    Example:
+        >>> numo = Numo()
+        >>> await numo.calculate("2 + 2")  # Basic math
+        >>> await numo.calculate("5 km to miles")  # Unit conversion
+        >>> await numo.calculate("100 USD to EUR")  # Currency conversion
+        >>> await numo.calculate("hello in spanish")  # Translation
+    """
+
     def __init__(self):
+        """Initialize Numo with default managers and modules."""
         self._managers: List[NumoManager] = [
             VariableManager(),
             FunctionManager(),
         ]
 
-        self._runners: List[NumoRunner] = [
-            TranslateRunner(),
-            UnitRunner(),
-            CurrencyRunner(),
-            MathRunner(),
-            VariableRunner(),
+        self._modules: List[NumoModule] = [
+            TranslateModule(),
+            UnitModule(),
+            CurrencyModule(),
+            MathModule(),
+            VariableModule(),
         ]
 
     async def calculate(self, lines: List[str]) -> List[Optional[str]]:
@@ -35,9 +55,16 @@ class Numo:
 
         Returns:
             List of results, None if processing failed
+
+        Example:
+            >>> results = await numo.calculate([
+            ...     "x = 5",
+            ...     "y = x * 2",
+            ...     "y km to miles"
+            ... ])
         """
         processed_sources = self._preprocess_input_lines(lines)
-        return await self._execute_runners(processed_sources)
+        return await self._execute_modules(processed_sources)
 
     def get_available_functions(self) -> List[str]:
         """
@@ -74,7 +101,38 @@ class Numo:
         )
         return variable_manager.get_available_variables()
 
-    async def _execute_runners(self, sources: List[str]) -> List[Optional[str]]:
+    def get_available_modules(self) -> List[str]:
+        """
+        Get a list of all active modules.
+
+        Returns:
+            List of module names sorted alphabetically.
+
+        Example:
+            >>> numo = Numo()
+            >>> numo.get_available_modules()
+            ['CurrencyModule', 'MathModule', 'TranslateModule', 'UnitModule', 'VariableModule']
+        """
+        return sorted([type(module).__name__ for module in self._modules])
+
+    def add_module(self, module: NumoModule) -> None:
+        """
+        Add a custom module to the Numo engine.
+
+        Args:
+            module: Instance of a NumoModule implementation
+
+        Example:
+            >>> class CustomModule(NumoModule):
+            ...     async def run(self, source: str) -> Optional[str]:
+            ...         return source.upper()
+            >>> numo.add_module(CustomModule())
+        """
+        if isinstance(module, NumoModule):
+            self._modules.append(module)
+
+    async def _execute_modules(self, sources: List[str]) -> List[Optional[str]]:
+        """Execute each source through available modules until a result is found."""
         results = []
 
         for source in sources:
@@ -83,10 +141,10 @@ class Numo:
                 continue
 
             result = None
-            for runner in self._runners:
-                runner_result = await runner.run(source)
-                if runner_result:
-                    result = runner_result
+            for module in self._modules:
+                module_result = await module.run(source)
+                if module_result:
+                    result = module_result
                     break
             if isinstance(result, float):
                 result = float(f"{result:.2f}")

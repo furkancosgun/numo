@@ -1,4 +1,4 @@
- {
+{
     "meter": {
       "id": "m",
       "phrases": ["meter", "meters", "m", "metre", "metres"],
@@ -43,6 +43,36 @@
       "id": "mm",
       "phrases": ["mm", "millimeter", "millimetre", "millimeters", "millimetres"],
       "unit": 1e-3
+    },
+    "mile": {
+      "id": "mi",
+      "phrases": ["mile", "miles", "mi"],
+      "unit": 1609.344
+    },
+    "micrometer": {
+      "id": "μm",
+      "phrases": ["micrometer", "micrometers", "μm", "micrometre", "micrometres"],
+      "unit": 1e-6
+    },
+    "picometer": {
+      "id": "pm",
+      "phrases": ["picometer", "picometers", "pm", "picometre", "picometres"],
+      "unit": 1e-12
+    },
+    "decimeter": {
+      "id": "dm",
+      "phrases": ["decimeter", "decimeters", "dm", "decimetre", "decimetres"],
+      "unit": 0.1
+    },
+    "megameter": {
+      "id": "Mm",
+      "phrases": ["megameter", "megameters", "Mm", "megametre", "megametres"],
+      "unit": 1e6
+    },
+    "league": {
+      "id": "league",
+      "phrases": ["league", "leagues"],
+      "unit": 4828.032
     }
-  }
+}
   

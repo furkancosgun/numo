@@ -2,21 +2,21 @@ from abc import ABC, abstractmethod
 from typing import Optional, Any
 
 
-class NumoRunner(ABC):
+class NumoModule(ABC):
     """
-    Abstract base class for all runners in the Numo system.
+    Abstract base class for all modules in the Numo system.
 
-    Runners are responsible for executing specific types of operations such as:
+    Modules are responsible for executing specific types of operations such as:
     - Mathematical calculations
     - Unit conversions
     - Currency conversions
     - Language translations
     - Variable operations
 
-    Each runner specializes in a specific domain and implements the run method
+    Each module specializes in a specific domain and implements the run method
     to handle operations within that domain.
 
-    Important: Runners should never raise exceptions. They should return:
+    Important: Modules should never raise exceptions. They should return:
     - str: For successful operations
     - None: For any error or invalid input
     """
@@ -24,7 +24,7 @@ class NumoRunner(ABC):
     @abstractmethod
     async def run(self, source: str) -> Optional[str]:
         """
-        Execute the runner's specific operation on the input string.
+        Execute the module's specific operation on the input string.
 
         Args:
             source: Preprocessed input string ready for execution
@@ -34,9 +34,9 @@ class NumoRunner(ABC):
             None: For any error or invalid input
 
         Example:
-            >>> runner = MathRunner()
-            >>> await runner.run("1 + 2")  # Returns "3"
-            >>> await runner.run("invalid")  # Returns None
+            >>> module = MathModule()
+            >>> await module.run("1 + 2")  # Returns "3"
+            >>> await module.run("invalid")  # Returns None
         """
         pass
 
@@ -56,5 +56,5 @@ class NumoRunner(ABC):
 
         try:
             return str(value)
-        except:  # Catch absolutely everything
+        except (ValueError, TypeError):  # Catch only specific exceptions
             return None

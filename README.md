@@ -4,175 +4,219 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
-Numo is a powerful, intuitive Python library that brings mathematics to life. It combines mathematical operations, unit conversions, currency exchanges, and translations into a single, elegant package. Whether you're a student, developer, or data scientist, Numo makes complex calculations and conversions feel natural and straightforward.
+> 🚀 Numo is a powerful text-based calculator and unit converter that brings mathematics to life through natural language processing. Whether you're a student, developer, or data scientist, Numo makes complex calculations feel natural and intuitive.
 
 ## ✨ Key Features
 
-### 🧮 Smart Mathematical Expression Evaluation
-- Safe and intelligent expression parsing
-- Support for complex mathematical operations
-- Built-in protection against dangerous operations
+### 🧮 Mathematical Functions
+- **Basic Operations**
+  - Arithmetic operations (`+`, `-`, `*`, `/`, `^`)
+  - Parentheses support for complex expressions
+  - Automatic decimal precision handling
 
-```python
-from numo import Numo
-numo = Numo()
+- **Advanced Mathematics**
+  - Trigonometric functions (`sin`, `cos`, `tan`, etc.)
+  - Logarithmic functions (`log`, `log10`, `exp`)
+  - Root calculations (`sqrt`, `cbrt`)
 
-# Basic calculations
-await numo.calculate("2 * (3 + 4)")  # Returns "14.0"
-await numo.calculate("2^3 + 4")      # Returns "12.0"
+- **Statistical Analysis**
+  - Basic statistics (`mean`, `median`, `mode`)
+  - Variance and standard deviation
+  - Quartiles and percentiles
 
-# Use mathematical constants
-await numo.calculate("2 * pi")       # Returns "6.28318530717959"
-await numo.calculate("e^2")          # Returns "7.3890560989307"
-```
+- **Vector Operations**
+  - Vector magnitude calculation
+  - Dot product computation
+  - Angle between vectors
 
-### 📐 Comprehensive Function Library
-Built-in mathematical and statistical functions:
+- **Financial Tools**
+  - Compound interest calculator
+  - Simple interest calculator
+  - Payment (PMT) calculator
 
-```python
-# Statistical functions
-await numo.calculate("avg(1, 2, 3, 4)")     # Returns "2.50"
-await numo.calculate("std(1, 2, 3, 4)")     # Returns "1.29"
+- **Advanced Features**
+  - Combinatorics (`permutation`, `combination`)
+  - Percentage calculations
+  - Custom rounding functions
 
-# Mathematical functions
-await numo.calculate("sin(pi/2)")           # Returns "1.00"
-await numo.calculate("log10(100)")          # Returns "2.00"
-await numo.calculate("sqrt(16)")            # Returns "4.00"
-```
+### 📏 Unit Conversions
+- **Physical Measurements**
+  - Length (meters, feet, miles, etc.)
+  - Weight (kilograms, pounds, etc.)
+  - Volume (liters, gallons, etc.)
+  - Area (square meters, acres, etc.)
 
-Available functions include:
-- Basic: `abs`, `round`, `floor`, `ceil`
-- Statistical: `sum`, `avg`, `min`, `max`, `median`, `var`, `std`
-- Trigonometric: `sin`, `cos`, `tan`, `asin`, `acos`, `atan`
-- Advanced Math: `pow`, `sqrt`, `log`, `log10`, `exp`, `fact`, `gcd`
+- **Time & Speed**
+  - Time units (seconds to years)
+  - Speed conversions (km/h, mph, etc.)
+  - Angular measurements (degrees, radians)
 
-### 📏 Intuitive Unit Conversions
-Convert between various units seamlessly:
+- **Digital Units**
+  - Storage (bytes to yottabytes)
+  - Data rates (bps to TBps)
+  - Both decimal (MB) and binary (MiB) units
 
-```python
-# Length conversions
-await numo.calculate("5.5 km to miles")    # Returns "3.42"
-await numo.calculate("72 inch to cm")      # Returns "182.88"
+- **Scientific Units**
+  - Pressure (pascal, bar, psi, etc.)
+  - Electrical (volt, ampere, watt, etc.)
+  - Power (horsepower, kilowatt, etc.)
 
-# Weight/Mass conversions
-await numo.calculate("100 kg to lbs")      # Returns "220.46"
-await numo.calculate("16 oz to grams")     # Returns "453.59"
-
-# Temperature conversions
-await numo.calculate("32 F to C")          # Returns "0.00"
-await numo.calculate("100 C to F")         # Returns "212.00"
-
-# Digital storage
-await numo.calculate("1.5 GB to MB")       # Returns "1536.00"
-```
-
-### 💱 Real-time Currency Conversion
-Up-to-date currency conversion with major world currencies:
-
-```python
-# Currency conversions
-await numo.calculate("100 USD to EUR")     # Real-time conversion
-await numo.calculate("1000 JPY to GBP")    # Real-time conversion
-await numo.calculate("50 EUR to TRY")      # Real-time conversion
-```
+- **Display Units**
+  - Screen measurements (px, pt, em)
+  - Resolution (dpi, ppi)
+  - Typography units (pica)
 
 ### 🌍 Language Translation
-Quick and accurate translations:
+- **Comprehensive Support**
+  - 100+ languages supported
+  - Natural language processing
+  - Automatic language detection
 
-```python
-# Simple translations
-await numo.calculate("hello in spanish")    # Returns "hola"
-await numo.calculate("good morning in french")  # Returns "bonjour"
-```
+- **Easy Syntax**
+  - Simple format: "text in language"
+  - Supports full sentences
+  - Maintains formatting
 
-### 📝 Smart Variable Management
-Define and use variables in your calculations:
+### 💾 Variable Management
+- **Smart Storage**
+  - Dynamic variable assignment
+  - Expression evaluation
+  - Persistent storage between sessions
 
-```python
-# Variable definitions and operations
-results = await numo.calculate([
-    "radius = 5",
-    "area = pi * radius^2",
-    "circumference = 2 * pi * radius",
-    "area"                          # Returns "78.54"
-])
+- **Advanced Features**
+  - Complex expression support
+  - Mathematical constants (`pi`, `e`, etc.)
+  - Function results storage
 
-# Using predefined constants
-await numo.calculate("phi * 10")    # Golden ratio * 10
-await numo.calculate("sqrt2 * 5")   # √2 * 5
-```
+## 🚀 Quick Start
 
-Built-in constants include:
-- Mathematical: `pi`, `e`, `tau`, `phi` (golden ratio)
-- Common values: `sqrt2`, `sqrt3`
-- Angles: `deg30`, `deg45`, `deg60`, `deg90`, `deg180`, `deg360`
-- Scientific: `c` (speed of light), `g` (gravity), `h` (Planck constant)
-
-## 🚀 Installation
+### Installation
 
 ```bash
-pip install numo
+# Clone the repository
+git clone https://github.com/furkancosgun/numo.git
+cd numo
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-## 🎯 Quick Start
+### Basic Usage
 
 ```python
 from numo import Numo
 
-# Create a Numo instance
+# Initialize Numo
 numo = Numo()
 
-# Start calculating!
-result = await numo.calculate("5 km to miles")
-print(result)  # "3.11"
+# Mathematical calculations
+await numo.calculate("2 * (3 + 4)")  # Returns: "14.00"
+await numo.calculate("sin(pi/2)")    # Returns: "1.00"
 
-# Chain operations
-results = await numo.calculate([
-    "distance = 100",              # Store variable
-    "time = 9.58",                # Usain Bolt's record
-    "speed = distance / time",     # Calculate speed
-    "speed km/h to mph"           # Convert to mph
+# Unit conversions
+await numo.calculate("5.5 km in miles")  # Returns: "3.42 miles"
+await numo.calculate("100 MB in GB")     # Returns: "0.10 GB"
+
+# Language translation
+await numo.calculate("Hello world in spanish")  # Returns: "hola mundo"
+
+# Variable management
+await numo.calculate([
+    "radius = 5",
+    "area = pi * radius^2",
+    "area"  # Returns: "78.54"
 ])
 ```
 
-## 🛠️ Advanced Usage
+## 📚 Detailed Examples
 
-### Custom Variable Management
+### 🧮 Mathematical Functions
 ```python
-# Define and use custom variables
-await numo.calculate([
-    "tax_rate = 0.18",
-    "price = 100",
-    "tax = price * tax_rate",
-    "total = price + tax",
-    "total"                        # Returns "118.00"
-])
+# Statistical Analysis
+mean(1, 2, 3, 4)     # Returns: 2.50
+std(1, 2, 3)         # Returns: 1.00
+percentile(75, 1, 2, 3, 4)  # Returns: 3.00
+
+# Vector Mathematics
+vector_magnitude(3, 4)         # Returns: 5.00
+vector_dot(1, 2, 3, 4)        # Returns: 11.00
+vector_angle(1, 0, 0, 1)      # Returns: 90.00
+
+# Financial Calculations
+compound_interest(1000, 5, 2)  # Returns: 1102.50
+pmt(1000, 5, 12)             # Returns: 85.47
+
+# Advanced Operations
+permutation(5, 2)    # Returns: 20.00
+combination(5, 2)    # Returns: 10.00
+percent_change(100, 150)  # Returns: 50.00
 ```
 
-### Complex Calculations
+### 📏 Unit Conversions
 ```python
-# Combine multiple features
-await numo.calculate([
-    "radius = 10 cm to m",         # Unit conversion
-    "volume = (4/3) * pi * radius^3",  # Mathematical expression
-    "volume m^3 to liters"         # Another conversion
-])
+# Length & Distance
+"5.5 meters in feet"      # Returns: 18.04 feet
+"1 mile in kilometers"    # Returns: 1.61 kilometers
+"100 yards in meters"     # Returns: 91.44 meters
+
+# Weight & Mass
+"150 pounds in kg"        # Returns: 68.04 kg
+"1000 grams in ounces"    # Returns: 35.27 ounces
+"2 tons in kilograms"     # Returns: 1814.37 kilograms
+
+# Digital Storage
+"1.5 GB in MB"           # Returns: 1536.00 MB
+"1 TiB in GiB"           # Returns: 1024.00 GiB
+"500 MB in bytes"        # Returns: 524288000 bytes
+
+# Data Transfer Rates
+"100 Mbps in Gbps"       # Returns: 0.10 Gbps
+"1 GBps in Mbps"         # Returns: 8192.00 Mbps
+
+# Scientific Units
+"1 bar in psi"           # Returns: 14.50 psi
+"760 mmHg in atm"        # Returns: 1.00 atm
+"100 hp in kW"           # Returns: 74.57 kW
 ```
 
 ## 🤝 Contributing
 
-We welcome contributions! Here's how you can help:
+We love your input! We want to make contributing to Numo as easy and transparent as possible, whether it's:
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Becoming a maintainer
+
+### Development Process
+
+1. Fork the repo and create your branch from `main`
+2. Add tests if you've added code that should be tested
+3. Update documentation if you've changed APIs
+4. Ensure the test suite passes
+5. Make sure your code follows the style guidelines
+6. Issue your pull request!
 
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🌟 Star Us!
+## 🌟 Show Your Support
 
 If you find Numo helpful, please consider giving us a star on GitHub! It helps us know that you find the project useful and encourages further development.
+
+## 📬 Contact
+
+Have questions? Feel free to [open an issue](https://github.com/furkancosgun/numo/issues)!
+
+---
+
+<p align="center">
+Made with ❤️ by Furkan Cosgun
+</p>
+

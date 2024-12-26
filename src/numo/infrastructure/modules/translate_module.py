@@ -1,15 +1,15 @@
 import re
 from typing import Optional
 import aiohttp
-from numo.domain.interfaces.numo_runner import NumoRunner
-from numo.infrastructure.runners.units import languages
+from numo.domain.interfaces.numo_module import NumoModule
+from numo.infrastructure.modules.languages import languages
 
 
-class TranslateRunner(NumoRunner):
+class TranslateModule(NumoModule):
     """
-    Runner for translating text between different languages.
-    Uses external translation API for translations.
-    Never raises exceptions - returns None for any error condition.
+    Language translation module.
+    Provides text translation services using Google Translate API.
+    Supports multiple languages and automatic language detection.
     """
 
     def __init__(self):
@@ -20,16 +20,11 @@ class TranslateRunner(NumoRunner):
 
     def _is_valid_language(self, lang_code: str) -> bool:
         """Check if a language code is supported."""
-        try:
-            # Check if it's a language name (partial match)
-            lang_code = lang_code.lower()
-            for code, name in self._languages.items():
-                if lang_code in name.lower() or name.lower() in lang_code:
-                    return True
-            # Check if it's a language code
-            return lang_code in self._languages
-        except:
-            return False
+        lang_code = lang_code.lower()
+        for code, name in self._languages.items():
+            if lang_code in name.lower() or name.lower() in lang_code:
+                return True
+        return lang_code in self._languages
 
     async def run(self, source: str) -> Optional[str]:
         """
@@ -43,54 +38,47 @@ class TranslateRunner(NumoRunner):
             None: For any error or invalid input
 
         Example:
-            >>> runner = TranslateRunner()
-            >>> await runner.run('hello in spanish')  # Returns "hola"
-            >>> await runner.run('invalid')  # Returns None
+            >>> module = TranslateModule()
+            >>> await module.run('hello in spanish')  # Returns "hola"
+            >>> await module.run('invalid')  # Returns None
         """
         if not source or not isinstance(source, str):
             return None
 
-        try:
-            # Parse translation request
-            match = re.match(self._pattern, source, re.IGNORECASE)
-            if not match:
-                return None
-
-            text = match.group(1)
-            to_lang = match.group(2).lower()
-
-            # Validate language
-            if not self._is_valid_language(to_lang):
-                return None
-
-            # Get language code
-            target_lang = self._get_language_code(to_lang)
-            if not target_lang:
-                return None
-
-            # Perform translation
-            translated = await self._translate_text(text, "auto", target_lang)
-            if translated:
-                return translated.lower()
+        # Parse translation request
+        match = re.match(self._pattern, source, re.IGNORECASE)
+        if not match:
             return None
 
-        except:  # Catch absolutely everything
+        text = match.group(1)
+        to_lang = match.group(2).lower()
+
+        # Validate language
+        if not self._is_valid_language(to_lang):
             return None
+
+        # Get language code
+        target_lang = self._get_language_code(to_lang)
+        if not target_lang:
+            return None
+
+        # Perform translation
+        translated = await self._translate_text(text, "auto", target_lang)
+        if translated:
+            return translated.lower()
+        return None
 
     def _get_language_code(self, language: str) -> Optional[str]:
         """Convert language name to ISO code."""
-        try:
-            language = language.lower()
-            # If it's already a code
-            if language in self._languages:
-                return language
-            # If it's a language name (partial match)
-            for code, name in self._languages.items():
-                if language in name.lower() or name.lower() in language:
-                    return code
-            return None
-        except:
-            return None
+        language = language.lower()
+        # If it's already a code
+        if language in self._languages:
+            return language
+        # If it's a language name (partial match)
+        for code, name in self._languages.items():
+            if language in name.lower() or name.lower() in language:
+                return code
+        return None
 
     async def _translate_text(
         self, text: str, from_lang: str, to_lang: str
@@ -133,5 +121,5 @@ class TranslateRunner(NumoRunner):
 
                     return translated if translated else None
 
-        except:  # Catch absolutely everything
+        except (aiohttp.ClientError, ValueError, KeyError, IndexError):
             return None

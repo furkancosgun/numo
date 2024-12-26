@@ -55,18 +55,14 @@ class VariableManager(NumoManager):
         if not source or not isinstance(source, str):
             return source
 
-        try:
-            # First check if it's a variable definition
-            source = source.strip()
-            is_definition, processed = self._process_definition(source)
-            if is_definition:
-                return processed
+        # First check if it's a variable definition
+        source = source.strip()
+        is_definition, processed = self._process_definition(source)
+        if is_definition:
+            return processed
 
-            # If not a definition, process variable references and operators
-            return self._process_references(source)
-
-        except:  # Catch absolutely everything
-            return source
+        # If not a definition, process variable references and operators
+        return self._process_references(source)
 
     def _process_definition(self, source: str) -> Tuple[bool, str]:
         """
@@ -78,31 +74,27 @@ class VariableManager(NumoManager):
         Returns:
             Tuple of (is_definition, processed_source)
         """
-        try:
-            # Check for assignment operators
-            for op in ["=", ":="]:
-                if op in source:
-                    parts = source.split(op, 1)
-                    if len(parts) == 2:
-                        name = parts[0].strip()
-                        value = parts[1].strip()
+        # Check for assignment operators
+        for op in ["=", ":="]:
+            if op in source:
+                parts = source.split(op, 1)
+                if len(parts) == 2:
+                    name = parts[0].strip()
+                    value = parts[1].strip()
 
-                        # Validate variable name
-                        if not self._is_valid_name(name):
-                            return False, source
+                    # Validate variable name
+                    if not self._is_valid_name(name):
+                        return False, source
 
-                        # Process value for any existing variable references
-                        processed_value = self._process_references(value)
+                    # Process value for any existing variable references
+                    processed_value = self._process_references(value)
 
-                        # Store the variable
-                        self._variables[name.lower()] = processed_value
+                    # Store the variable
+                    self._variables[name.lower()] = processed_value
 
-                        return True, f"{name} {op} {processed_value}"
+                    return True, f"{name} {op} {processed_value}"
 
-            return False, source
-
-        except:  # Catch absolutely everything
-            return False, source
+        return False, source
 
     def _process_references(self, source: str) -> str:
         """
@@ -114,22 +106,18 @@ class VariableManager(NumoManager):
         Returns:
             Processed source with references/aliases replaced
         """
-        try:
-            tokens = source.split()
-            processed = []
+        tokens = source.split()
+        processed = []
 
-            for token in tokens:
-                # Try to replace variable or operator
-                lower_token = token.lower()
-                if lower_token in self._variables:
-                    processed.append(self._variables[lower_token])
-                else:
-                    processed.append(token)
+        for token in tokens:
+            # Try to replace variable or operator
+            lower_token = token.lower()
+            if lower_token in self._variables:
+                processed.append(self._variables[lower_token])
+            else:
+                processed.append(token)
 
-            return " ".join(processed)
-
-        except:  # Catch absolutely everything
-            return source
+        return " ".join(processed)
 
     def _is_valid_name(self, name: str) -> bool:
         """
@@ -141,54 +129,47 @@ class VariableManager(NumoManager):
         Returns:
             True if name is valid, False otherwise
         """
-        try:
-            # Must be a string and not empty
-            if not name or not isinstance(name, str):
-                return False
-
-            # Must start with letter or underscore
-            if not name[0].isalpha() and name[0] != "_":
-                return False
-
-            # Rest must be alphanumeric or underscore
-            return all(c.isalnum() or c == "_" for c in name[1:])
-
-        except:  # Catch absolutely everything
+        # Must be a string and not empty
+        if not name or not isinstance(name, str):
             return False
+
+        # Must start with letter or underscore
+        if not name[0].isalpha() and name[0] != "_":
+            return False
+
+        # Rest must be alphanumeric or underscore
+        return all(c.isalnum() or c == "_" for c in name[1:])
 
     def _initialize_operators(self) -> None:
         """Initialize mathematical operator aliases and constants."""
-        try:
-            # Initialize operators and their aliases
-            for operator, aliases in self._operators.items():
-                # Store operator itself
-                self._variables[operator] = operator
-                # Store all aliases
-                for alias in aliases:
-                    self._variables[alias.lower()] = operator
+        # Initialize operators and their aliases
+        for operator, aliases in self._operators.items():
+            # Store operator itself
+            self._variables[operator] = operator
+            # Store all aliases
+            for alias in aliases:
+                self._variables[alias.lower()] = operator
 
-            # Mathematical constants
-            self._variables.update(
-                {
-                    # Basic mathematical constants
-                    "pi": str(math.pi),
-                    "e": str(math.e),
-                    "tau": str(math.tau),  # 2π
-                    # Common fractions as decimals
-                    "phi": str((1 + math.sqrt(5)) / 2),  # Golden ratio
-                    "sqrt2": str(math.sqrt(2)),
-                    "sqrt3": str(math.sqrt(3)),
-                    # Common angles in radians
-                    "deg30": str(math.pi / 6),
-                    "deg45": str(math.pi / 4),
-                    "deg60": str(math.pi / 3),
-                    "deg90": str(math.pi / 2),
-                    "deg180": str(math.pi),
-                    "deg360": str(2 * math.pi),
-                }
-            )
-        except:  # Catch absolutely everything
-            pass
+        # Mathematical constants
+        self._variables.update(
+            {
+                # Basic mathematical constants
+                "pi": str(math.pi),
+                "e": str(math.e),
+                "tau": str(math.tau),  # 2π
+                # Common fractions as decimals
+                "phi": str((1 + math.sqrt(5)) / 2),  # Golden ratio
+                "sqrt2": str(math.sqrt(2)),
+                "sqrt3": str(math.sqrt(3)),
+                # Common angles in radians
+                "deg30": str(math.pi / 6),
+                "deg45": str(math.pi / 4),
+                "deg60": str(math.pi / 3),
+                "deg90": str(math.pi / 2),
+                "deg180": str(math.pi),
+                "deg360": str(2 * math.pi),
+            }
+        )
 
     def get_variable(self, name: str) -> Optional[str]:
         """
@@ -200,23 +181,17 @@ class VariableManager(NumoManager):
         Returns:
             Variable value if exists, None otherwise
         """
-        try:
-            return self._variables.get(name.lower())
-        except:  # Catch absolutely everything
-            return None
+        return self._variables.get(name.lower())
 
     def clear_variables(self) -> None:
         """Clear all user variables but keep operator aliases."""
-        try:
-            # Keep only operator aliases
-            operators = {
-                name: value
-                for name, value in self._variables.items()
-                if any(value == op for op in self._operators.keys())
-            }
-            self._variables = operators
-        except:  # Catch absolutely everything
-            pass
+        # Keep only operator aliases
+        operators = {
+            name: value
+            for name, value in self._variables.items()
+            if any(value == op for op in self._operators.keys())
+        }
+        self._variables = operators
 
     def get_available_variables(self) -> list[str]:
         """
@@ -226,7 +201,4 @@ class VariableManager(NumoManager):
             List of variable names sorted alphabetically, including both
             user-defined variables and built-in constants.
         """
-        try:
-            return sorted(list(self._variables.keys()))
-        except:  # Catch absolutely everything
-            return []
+        return sorted(list(self._variables.keys()))

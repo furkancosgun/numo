@@ -1,11 +1,12 @@
 """Infrastructure layer containing implementations."""
+
 from .managers import VariableManager, FunctionManager
-from .runners import (
-    MathRunner,
-    TranslateRunner,
-    CurrencyRunner,
-    UnitRunner,
-    VariableRunner
+from .modules import (
+    MathModule,
+    TranslateModule,
+    CurrencyModule,
+    UnitModule,
+    VariableModule,
 )
 
 __all__ = [
@@ -15,5 +16,5 @@ __all__ = [
     "TranslateRunner",
     "CurrencyRunner",
     "UnitRunner",
-    "VariableRunner"
-] 
+    "VariableRunner",
+]

@@ -1,21 +1,18 @@
 import re
 from typing import Optional
 from numo.services.math_service import MathService
-from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_module import NumoModule
 
 
-class VariableRunner(NumoRunner):
+class VariableModule(NumoModule):
     """
-    Runner class that handles variable definition and assignment operations.
-
-    This class processes variable declarations and value assignments.
-    Supported formats:
-        x = 5
-        y := 10
+    Variable management module.
+    Handles variable definition, assignment, and evaluation operations.
+    Supports various assignment formats and value processing.
     """
 
     def __init__(self):
-        """Initializes the regex pattern required for the runner."""
+        """Initialize with variable pattern."""
         self._pattern = r"(\w+)\s*[:=]\s*(.+)"
 
     async def run(self, source: str) -> Optional[str]:

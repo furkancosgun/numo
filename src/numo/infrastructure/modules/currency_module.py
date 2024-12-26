@@ -1,15 +1,15 @@
 import re
 from typing import Optional, Dict
 import aiohttp
-from numo.domain.interfaces.numo_runner import NumoRunner
+from numo.domain.interfaces.numo_module import NumoModule
 import time
 
 
-class CurrencyRunner(NumoRunner):
+class CurrencyModule(NumoModule):
     """
-    Runner for converting between different currencies.
-    Uses external exchange rate API for conversions.
-    Never raises exceptions - returns None for any error condition.
+    Currency conversion module.
+    Provides real-time currency conversion using external exchange rate API.
+    Includes caching mechanism to optimize API usage.
     """
 
     def __init__(self):
@@ -18,7 +18,7 @@ class CurrencyRunner(NumoRunner):
         self._api_url = "https://api.exchangerate-api.com/v4/latest/USD"
         self._rates: Dict[str, float] = {}
         self._last_update = 0
-        self._cache_duration = 24 * 60 * 60  # 24 saat (saniye cinsinden)
+        self._cache_duration = 24 * 60 * 60  # 24 hours in seconds
 
     async def run(self, source: str) -> Optional[str]:
         """
@@ -32,37 +32,39 @@ class CurrencyRunner(NumoRunner):
             None: For any error or invalid input
 
         Example:
-            >>> runner = CurrencyRunner()
-            >>> await runner.run("100 USD to EUR")  # Returns "85.23 EUR"
-            >>> await runner.run("invalid")  # Returns None
+            >>> module = CurrencyModule()
+            >>> await module.run("100 USD to EUR")  # Returns "85.23 EUR"
+            >>> await module.run("invalid")  # Returns None
         """
         if not source or not isinstance(source, str):
             return None
 
-        try:
-            # Parse conversion request
-            match = re.match(self._pattern, source, re.IGNORECASE)
-            if not match:
-                return None
+        # Parse conversion request
+        match = re.match(self._pattern, source, re.IGNORECASE)
+        if not match:
+            return None
 
+        try:
             amount = float(match.group(1))
             from_curr = match.group(2).upper()
             to_curr = match.group(3).upper()
+        except (ValueError, TypeError):
+            return None
 
-            # Get exchange rates
-            rates = await self._get_exchange_rates()
-            if not rates:
-                return None
+        # Get exchange rates
+        rates = await self._get_exchange_rates()
+        if not rates:
+            return None
 
-            # Validate currencies
-            if from_curr not in rates or to_curr not in rates:
-                return None
+        # Validate currencies
+        if from_curr not in rates or to_curr not in rates:
+            return None
 
+        try:
             # Convert amount
             result = amount * (rates[to_curr] / rates[from_curr])
             return self._format_result(result, to_curr)
-
-        except:  # Catch absolutely everything
+        except (ValueError, ZeroDivisionError):
             return None
 
     async def _get_exchange_rates(self) -> Optional[Dict[str, float]]:
@@ -76,7 +78,7 @@ class CurrencyRunner(NumoRunner):
         """
         current_time = time.time()
 
-        # Cache'lenmiş veri varsa ve süresi geçmediyse onu kullan
+        # Use cached data if still valid
         if self._rates and (current_time - self._last_update) < self._cache_duration:
             return self._rates
 
@@ -84,7 +86,6 @@ class CurrencyRunner(NumoRunner):
             async with aiohttp.ClientSession() as session:
                 async with session.get(self._api_url) as response:
                     if response.status != 200:
-                        # Cache boş değilse, hata durumunda cache'i kullan
                         return self._rates if self._rates else None
 
                     data = await response.json()
@@ -98,18 +99,18 @@ class CurrencyRunner(NumoRunner):
                     # Add base currency
                     rates["USD"] = 1.0
 
-                    # Cache'i güncelle
+                    # Update cache
                     self._rates = rates
                     self._last_update = current_time
                     return rates
 
-        except:  # Catch absolutely everything
-            # Hata durumunda eğer cache varsa onu kullan
+        except (aiohttp.ClientError, ValueError, KeyError):
+            # Return cached rates if available, otherwise None
             return self._rates if self._rates else None
 
     def _format_result(self, value: float, currency: str) -> str:
         """Format currency amount with 2 decimal places and currency code."""
         try:
             return f"{value:.2f} {currency}"
-        except:
+        except (ValueError, TypeError):
             return str(value)
